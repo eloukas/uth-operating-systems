@@ -22,7 +22,8 @@ _Volos, Greece, 2016-17._
 
 * [Klainti Bodurri](https://github.com/klainti) - kbontourri@gmail.com
 	
-* [Panagiotis Chytas](https://github.com/klainti) - schytas@uth.gr
+* [Panagiotis Chytas](https://github.com/PanagiotisChytas) - chytas96@gmail.com
+
 
 #Instructor: 
 
