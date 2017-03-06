@@ -2,7 +2,7 @@
 A series of 4 practical exercises for CE321 to help us in the understanding of basic OS principles.
 The main objective of the course is to provide us the opportunity to understand the role and services of modern operating systems, 
 deepen the design and function, to understand the dilemmas faced by designers of operating systems 
-and be able to appreciate the advantages and disadvantages each design choice.
+and be able to appreciate the advantages and disadvantages of each design choice.
 
 In this project repository we uploaded one OS-project, divided by 4 phases(homework1-4) where we integrated our own code into
 the Linux Kernel.
