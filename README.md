@@ -6,6 +6,7 @@ and be able to appreciate the advantages and disadvantages each design choice.
 
 In this project repository we uploaded one OS-project, divided by 4 phases(homework1-4) where we integrated our own code into
 the Linux Kernel.
+
 More information can be found in each homework, like the .pdf assignment.
 We worked in (K)Ubuntu 14.04.
 
