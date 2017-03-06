@@ -1,6 +1,6 @@
 # Operating-Systems
 A series of 4 practical exercises for CE321 to help us in the understanding of basic OS principles.
-The main objective of the course is to provide students the opportunity to understand the role and services of modern operating systems, 
+The main objective of the course is to provide us the opportunity to understand the role and services of modern operating systems, 
 deepen the design and function, to understand the dilemmas faced by designers of operating systems 
 and be able to appreciate the advantages and disadvantages each design choice.
 
