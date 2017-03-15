@@ -2,11 +2,11 @@
 
                        /usr/src/linux-3.14.62-dev/kernel
 
-* Modify  **_Makefile_**     ---> Add **find_roots.o** in the Makefile to compile it with the kernel compilation!
+* Modify  **_Makefile_**     ---> In the last line, add **find_roots.o** to compile the Makefile with the kernel compilation!
 
                       path same as find_roots.c (/usr/src/linux-3.14.62-dev/kernel)
 
-* Modify **_syscall_32.tbl_** ---> Add unique id for find_roots syscall (id:353)
+* Modify **_syscall_32.tbl_** ---> In the last line, add unique id for find_roots syscall (id:353)
 
                       /usr/src/linux-3.14.62-dev/arch/x86/syscalls/syscall_32.tbl
 
