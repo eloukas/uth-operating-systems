@@ -16,7 +16,7 @@
 
 
 Finally, compile the kernel while you are in path: _/usr/src/linux-3.14.62-dev_
-using the following command
+using the following command:
 
-sudo make
+                      sudo make
 
