@@ -17,7 +17,7 @@ _Electrical and Computer Engineering Dept, University Of Thessaly._
 _Volos, Greece, 2016-17._
 
 	
-#Contributors & Communication
+# Contributors & Communication
 * [Eleftherios P. Loukas](https://github.com/eloukas) - eleftheriosloukas@gmail.com
 
 * [Klainti Bodurri](https://github.com/klainti) - kbontourri@gmail.com
@@ -25,6 +25,6 @@ _Volos, Greece, 2016-17._
 * [Panagiotis Chytas](https://github.com/PanagiotisChytas) - chytas96@gmail.com
 
 
-#Instructor: 
+# Instructor: 
 
 	% Christos D. Antonopoulos
