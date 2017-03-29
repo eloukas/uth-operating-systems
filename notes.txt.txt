@@ -1,0 +1,35 @@
+struct runqueue *rq = pointer to RUNQUEUE
+struct task_struct *current = pointer to current running task
+jiffies = unit for scheduling (1/10ms)
+
+/* task_struct */
+struct task_struct
+{
+	struct thread_info *thread_info;		/* Information about the thread */
+	unsigned int time_slice;				/* Timeslice values */
+	enum sleep_type sleep_type;				/* What type of sleep task is in */
+	int need_reschedule;					/* Flag, set if task needs to
+											   have schedule called */
+	struct task_struct *prev, *next;	/* Used to link the task struct in the 
+										   runqueue. Make sure to set them to
+										   NULL when the process is not in the
+										   runqueue */
+										 
+
+	double goodness;
+	double burst;
+	double exp_burst;
+  /* runqueue */
+struct runqueue {
+    unsigned long    nr_running;			/* number of runnable tasks */
+	struct task_struct *head;
+};
+
+void initschedule(struct runqueue *newrq, struct task_struct *seedTask);
+void killschedule();
+void schedule();
+void activate_task(struct task_struct *p);
+void deactivate_task(struct task_struct *p);
+void scheduler_tick(struct task_struct *p);
+void sched_fork(struct task_struct *p);
+void wake_up_new_task(struct task_struct *p);
