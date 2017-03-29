@@ -11,6 +11,7 @@
 #include "list.h"
 
 #define NEWTASKSLICE (NS_TO_JIFFIES(100000000))
+#define FACTOR 0.5
 
 /* Local Globals
  * rq - This is a pointer to the runqueue that the scheduler uses.
@@ -115,6 +116,12 @@ void schedule()
 void sched_fork(struct task_struct *p)
 {
 	p->time_slice = 100;
+
+	// Initialize values to zero
+	p->burst=0;
+	p->exp_burst=0;
+	p->goodness=0;
+	p->waiting_in_rq=0; 
 }
 
 /* scheduler_tick

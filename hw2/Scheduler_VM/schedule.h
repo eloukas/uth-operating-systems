@@ -29,6 +29,12 @@ struct task_struct
 										   NULL when the process is not in the
 										   runqueue */
 /* ---------------- Do NOT Touch END-------------- */
+
+	unsigned double burst;
+	unsigned double exp_burst;
+	unsigned double goodness;
+	unsigned double waiting_in_rq; 
+	
 };
 
 /* runqueue */
