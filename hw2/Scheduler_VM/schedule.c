@@ -68,11 +68,14 @@ void print_rq () {
 	
 	printf("Rq: \n");
 	curr = rq->head;
-	if (curr)
-		printf("%p", curr);
+	if (curr){
+		printf("%p\n", curr);
+		printf("Burst: %lf \nExp_Burst: %lf \nGoodness: %lf\n", curr->burst,curr->exp_burst,curr->goodness);
+	}
 	while(curr->next != rq->head) {
 		curr = curr->next;
-		printf(", %p", curr);
+		printf("%p\n", curr);
+		printf("Burst: %lf \nExp_Burst: %lf \nGoodness: %lf\n", curr->burst,curr->exp_burst,curr->goodness);
 	};
 	printf("\n");
 }
@@ -105,7 +108,15 @@ void schedule()
 		if (nxt == rq->head)    /* Do this to always skip init at the head */
 			nxt = nxt->next;	/* of the queue, whenever there are other  */
 								/* processes available					   */
+		
+		// Calc burst,goodness etc..
+		current->burst = sched_clock() - current->process_start_time;
+		current->exp_burst = (current->burst + FACTOR*current->exp_burst)/(1 + FACTOR);
+
 		context_switch(curr);
+		
+		// calc start time of current task
+		current->process_start_time = sched_clock();
 	}
 }
 
@@ -121,6 +132,7 @@ void sched_fork(struct task_struct *p)
 	p->burst=0;
 	p->exp_burst=0;
 	p->goodness=0;
+	p->process_start_time=0;	
 	p->waiting_in_rq=0; 
 }
 

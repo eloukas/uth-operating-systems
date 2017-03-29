@@ -33,7 +33,8 @@ struct task_struct
 	unsigned double burst;
 	unsigned double exp_burst;
 	unsigned double goodness;
-	unsigned double waiting_in_rq; 
+	unsigned double waiting_in_rq;
+	unsigned double process_start_time; 
 	
 };
 
