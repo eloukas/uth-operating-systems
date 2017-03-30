@@ -24,18 +24,18 @@ struct task_struct
 	enum sleep_type sleep_type;				/* What type of sleep task is in */
 	int need_reschedule;					/* Flag, set if task needs to
 											   have schedule called */
-	struct task_struct *prev, *next;	/* Used to link the task struct in the 
+	struct task_struct *prev, *next;	/* Used to link the task struct in the
 										   runqueue. Make sure to set them to
 										   NULL when the process is not in the
 										   runqueue */
 /* ---------------- Do NOT Touch END-------------- */
 
-	unsigned double burst;
-	unsigned double exp_burst;
-	unsigned double goodness;
-	unsigned double waiting_in_rq;
-	unsigned double process_start_time; 
-	
+	double burst;
+	double exp_burst;
+	double goodness;
+	double waiting_in_rq;
+	double process_start_time; 
+
 };
 
 /* runqueue */
@@ -49,7 +49,7 @@ struct runqueue {
  * convenience, and mimic system calls provided
  * normally by Linux
  */
-void context_switch(struct task_struct *next); 
+void context_switch(struct task_struct *next);
 unsigned long long sched_clock();
 
 /*------------------YOU MAY EDIT BELOW THIS LINE---------------------*/

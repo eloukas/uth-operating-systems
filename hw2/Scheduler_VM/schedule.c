@@ -1,5 +1,5 @@
 /* schedule.c
- * This file contains the primary logic for the 
+ * This file contains the primary logic for the
  * scheduler.
  */
 #include "schedule.h"
@@ -22,7 +22,7 @@ struct task_struct *current;
 
 /* External Globals
  * jiffies - A discrete unit of time used for scheduling.
- *			 There are HZ jiffies in a second, (HZ is 
+ *			 There are HZ jiffies in a second, (HZ is
  *			 declared in macros.h), and is usually
  *			 1 or 10 milliseconds.
  */
@@ -33,11 +33,11 @@ extern struct task_struct *idle;
 /* This code is not used by the scheduler, but by the virtual machine
  * to setup and destroy the scheduler cleanly.
  */
- 
+
  /* initscheduler
   * Sets up and allocates memory for the scheduler, as well
   * as sets initial values. This function should also
-  * set the initial effective priority for the "seed" task 
+  * set the initial effective priority for the "seed" task
   * and enqueu it in the scheduler.
   * INPUT:
   * newrq - A pointer to an allocated rq to assign to your
@@ -53,7 +53,7 @@ void initschedule(struct runqueue *newrq, struct task_struct *seedTask)
 }
 
 /* killschedule
- * This function should free any memory that 
+ * This function should free any memory that
  * was allocated when setting up the runqueu.
  * It SHOULD NOT free the runqueue itself.
  */
@@ -65,7 +65,7 @@ void killschedule()
 
 void print_rq () {
 	struct task_struct *curr;
-	
+
 	printf("Rq: \n");
 	curr = rq->head;
 	if (curr){
@@ -90,31 +90,55 @@ void schedule()
 {
 	static struct task_struct *nxt = NULL;
 	struct task_struct *curr;
-	
+
+    double max_waiting_in_rq;
+    double min_exp_burst;
+
 //	printf("In schedule\n");
 //	print_rq();
-	
+
 	current->need_reschedule = 0; /* Always make sure to reset that, in case *
 								   * we entered the scheduler because current*
 								   * had requested so by setting this flag   */
-	
+
 	if (rq->nr_running == 1) {
 		context_switch(rq->head);
 		nxt = rq->head->next;
 	}
-	else {	
+	else {
+
+        //traverse the whole list and find the min, max
+        curr = (rq->head)->next;
+        max_waiting_in_rq = curr->waiting_in_rq;
+        min_exp_burst = curr->exp_burst;
+
+        curr = curr->next;
+
+        while (curr != rq->head) {
+            if (curr->waiting_in_rq > max_waiting_in_rq)
+                max_waiting_in_rq = curr->waiting_in_rq;
+
+            if (curr->exp_burst > min_exp_burst)
+                min_exp_burst = curr->exp_burst;
+
+            curr = curr->next;
+        }
+
+
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
 		curr = nxt;
 		nxt = nxt->next;
 		if (nxt == rq->head)    /* Do this to always skip init at the head */
 			nxt = nxt->next;	/* of the queue, whenever there are other  */
 								/* processes available					   */
-		
+
 		// Calc burst,goodness etc..
 		current->burst = sched_clock() - current->process_start_time;
 		current->exp_burst = (current->burst + FACTOR*current->exp_burst)/(1 + FACTOR);
 
 		context_switch(curr);
-		
+
 		// calc start time of current task
 		current->process_start_time = sched_clock();
 	}
@@ -132,8 +156,8 @@ void sched_fork(struct task_struct *p)
 	p->burst=0;
 	p->exp_burst=0;
 	p->goodness=0;
-	p->process_start_time=0;	
-	p->waiting_in_rq=0; 
+	p->process_start_time=0;
+	p->waiting_in_rq=0;
 }
 
 /* scheduler_tick
@@ -151,12 +175,12 @@ void scheduler_tick(struct task_struct *p)
  * (being created).
  */
 void wake_up_new_task(struct task_struct *p)
-{	
+{
 	p->next = rq->head->next;
 	p->prev = rq->head;
 	p->next->prev = p;
 	p->prev->next = p;
-	
+
 	rq->nr_running++;
 }
 
@@ -170,7 +194,7 @@ void activate_task(struct task_struct *p)
 	p->prev = rq->head;
 	p->next->prev = p;
 	p->prev->next = p;
-	
+
 	rq->nr_running++;
 }
 
