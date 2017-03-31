@@ -118,7 +118,7 @@ void schedule()
             if (curr->waiting_in_rq > max_waiting_in_rq)
                 max_waiting_in_rq = curr->waiting_in_rq;
 
-            if (curr->exp_burst > min_exp_burst)
+            if (curr->exp_burst < min_exp_burst)
                 min_exp_burst = curr->exp_burst;
 
             curr = curr->next;
