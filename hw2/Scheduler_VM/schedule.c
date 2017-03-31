@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "list.h"
+#include "privatestructs.h"
 
 #define NEWTASKSLICE (NS_TO_JIFFIES(100000000))
 #define FACTOR 0.5
@@ -69,13 +70,13 @@ void print_rq () {
 	printf("Rq: \n");
 	curr = rq->head;
 	if (curr){
-		printf("%p\n", curr);
-		printf("Burst: %lf \nExp_Burst: %lf \nGoodness: %lf\n", curr->burst,curr->exp_burst,curr->goodness);
+		printf("%s\n", curr->thread_info->processName);
+		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness/1000000);
 	}
 	while(curr->next != rq->head) {
 		curr = curr->next;
-		printf("%p\n", curr);
-		printf("Burst: %lf \nExp_Burst: %lf \nGoodness: %lf\n", curr->burst,curr->exp_burst,curr->goodness);
+		printf("%s\n", curr->thread_info->processName);
+		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness/1000000);
 	};
 	printf("\n");
 }
@@ -94,8 +95,8 @@ void schedule()
     double max_waiting_in_rq;
     double min_exp_burst;
 
-//	printf("In schedule\n");
-//	print_rq();
+	printf("In schedule\n");
+	print_rq();
 
 	current->need_reschedule = 0; /* Always make sure to reset that, in case *
 								   * we entered the scheduler because current*
@@ -142,6 +143,10 @@ void schedule()
 		// calc start time of current task
 		current->process_start_time = sched_clock();
 	}
+    print_rq();
+    printf("Running process: %s\n", current->thread_info->processName);
+    printf("~!!!!Done with scheduling!!!!~\n");
+
 }
 
 
