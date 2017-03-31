@@ -71,12 +71,12 @@ void print_rq () {
 	curr = rq->head;
 	if (curr){
 		printf("%s\n", curr->thread_info->processName);
-		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness/1000000);
+		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\nWaiting_in_rq: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness,curr->waiting_in_rq/1000000);
 	}
 	while(curr->next != rq->head) {
 		curr = curr->next;
 		printf("%s\n", curr->thread_info->processName);
-		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness/1000000);
+		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\nWaiting_in_rq: %4.2lf\n", curr->burst/1000000,curr->exp_burst/1000000,curr->goodness,curr->waiting_in_rq/1000000);
 	};
 	printf("\n");
 }
@@ -116,7 +116,7 @@ void schedule()
         curr = curr->next;
 
         while (curr != rq->head) {
-            if (curr->waiting_in_rq > max_waiting_in_rq)
+            if (curr->waiting_in_rq < max_waiting_in_rq)
                 max_waiting_in_rq = curr->waiting_in_rq;
 
             if (curr->exp_burst < min_exp_burst)
@@ -124,8 +124,10 @@ void schedule()
 
             curr = curr->next;
         }
+        max_waiting_in_rq = sched_clock() - max_waiting_in_rq;
 
 
+        printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",min_exp_burst/1000000,max_waiting_in_rq/1000000, sched_clock()/1000000);
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
 		curr = nxt;
@@ -134,9 +136,12 @@ void schedule()
 			nxt = nxt->next;	/* of the queue, whenever there are other  */
 								/* processes available					   */
 
+
+        current->waiting_in_rq = (sched_clock() > current->waiting_in_rq) ? sched_clock() : current->waiting_in_rq;
 		// Calc burst,goodness etc..
 		current->burst = sched_clock() - current->process_start_time;
 		current->exp_burst = (current->burst + FACTOR*current->exp_burst)/(1 + FACTOR);
+        current->goodness = ((1 + current->exp_burst/1000000) / (1 + min_exp_burst/1000000)) * ((1 + max_waiting_in_rq/1000000) / (1 + current->waiting_in_rq/1000000)); 
 
 		context_switch(curr);
 
@@ -201,6 +206,7 @@ void activate_task(struct task_struct *p)
 	p->prev->next = p;
 
 	rq->nr_running++;
+    p->waiting_in_rq = (sched_clock() > p->waiting_in_rq) ? sched_clock() : p->waiting_in_rq;
 }
 
 /* deactivate_task
