@@ -6,7 +6,9 @@
 double calc_waiting_time_in_rq(struct task_struct *current);
 double calc_burst(struct task_struct *current);
 double calc_exp_burst(struct task_struct *current);
-double calc_goodness(struct task_struct *current,double min_exp_burst,double max_waiting_in_rq);
+double calc_goodness(struct task_struct *current);
 double start_time();
+
+void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq);
 
 #endif
