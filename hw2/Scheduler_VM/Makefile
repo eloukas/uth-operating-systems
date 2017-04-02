@@ -22,10 +22,10 @@ LIB_OBJS = cpuinit.o cpu.o
 SCHED_SRCS = schedule.c
 
 # Put the name of any additional source file here
-ADD_SRCS = 
+ADD_SRCS = sjf_lib.c
 
 # Include files
-INC_FILES = privatestructs.h macros.h schedule.h
+INC_FILES = privatestructs.h macros.h schedule.h 
 
 # The name of the virtual machine's library, without the lib prefix and the .a suffix
 LIB_NAME = sched_vm
