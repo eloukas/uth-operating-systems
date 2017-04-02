@@ -145,7 +145,7 @@ void schedule()
         context_switch(curr);
 
 		// calc start time of current task
-		current->process_start_time = sched_clock()/1000000;
+		current->process_start_time = start_time();
 	}
     print_rq();
     printf("Running process: %s\n", current->thread_info->processName);

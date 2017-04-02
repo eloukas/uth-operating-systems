@@ -34,3 +34,9 @@ double calc_goodness(struct task_struct *current,double min_exp_burst,double max
 
     return ((1 + current->exp_burst) / (1 + min_exp_burst)) * ((1 + max_waiting_in_rq) / (1 + current->waiting_in_rq));
 }
+
+// Return starting time of process
+double start_time(){
+
+    return sched_clock()/DIVIDE_CONST;
+}
