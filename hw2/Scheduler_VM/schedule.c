@@ -63,21 +63,24 @@ void killschedule()
 	return;
 }
 
+void print_me(struct task_struct *curr){ 
+}
+
 
 void print_rq () {
 	struct task_struct *curr;
 
-	printf("Rq: \n");
+	printf("---------------------------------------------------------------------------------\n");
+    printf("%-25s%-10s%-25s%-10s\n", "Name","Burst","Expected Burst","Goodness");
 	curr = rq->head;
 	if (curr){
-		printf("%s\n", curr->thread_info->processName);
-		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\nWaiting_in_rq: %4.2lf\n", curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
+        printf("%-25s%-10.2lf%-25.2lf%-10.2lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness);
 	}
 	while(curr->next != rq->head) {
 		curr = curr->next;
-		printf("%s\n", curr->thread_info->processName);
-		printf("Burst: %4.2lf \nExp_Burst: %4.2lf \nGoodness: %4.2lf\nWaiting_in_rq: %4.2lf\n", curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
+        printf("%-25s%-10.2lf%-25.2lf%-10.2lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness);
 	};
+	printf("---------------------------------------------------------------------------------\n");
 	printf("\n");
 }
 
