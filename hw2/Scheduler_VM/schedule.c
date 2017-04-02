@@ -95,9 +95,6 @@ void schedule()
 	static struct task_struct *nxt = NULL;
 	struct task_struct *curr;
 
-    double max_waiting_in_rq;
-    double min_exp_burst;
-
 	printf("In schedule\n");
 	print_rq();
 
@@ -111,39 +108,17 @@ void schedule()
 	}
 	else {
 
-        //traverse the whole list and find the min, max
-        curr = (rq->head)->next;
-        max_waiting_in_rq = curr->waiting_in_rq;
-        min_exp_burst = curr->exp_burst;
-
-        curr = curr->next;
-
-        while (curr != rq->head) {
-            if (curr->waiting_in_rq < max_waiting_in_rq)
-                max_waiting_in_rq = curr->waiting_in_rq;
-
-            if (curr->exp_burst < min_exp_burst)
-                min_exp_burst = curr->exp_burst;
-
-            curr = curr->next;
-        }
-        max_waiting_in_rq = ((sched_clock()/1000000) - max_waiting_in_rq);
-
-        printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",min_exp_burst,max_waiting_in_rq, sched_clock()/1000000);
-        //////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////
-		curr = nxt;
+	    curr = nxt;
 		nxt = nxt->next;
 		if (nxt == rq->head)    /* Do this to always skip init at the head */
 			nxt = nxt->next;	/* of the queue, whenever there are other  */
 								/* processes available					   */
  
-		// Calc burst,goodness etc..
+		// Calc burst,goodness etc.. 
         current->waiting_in_rq = calc_waiting_time_in_rq(current);
 		current->burst = calc_burst(current);
-		current->exp_burst = calc_exp_burst(current);
-        current->goodness = calc_goodness(current,min_exp_burst,max_waiting_in_rq);
-            
+		current->exp_burst = calc_exp_burst(current);    
+        current->goodness = calc_goodness(current);
         
         context_switch(curr);
 
