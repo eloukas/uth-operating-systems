@@ -46,8 +46,7 @@ extern struct task_struct *idle;
 * seedTask - A pointer to a task to seed the scheduler and start
 * the simulation.
 */
-void initschedule(struct runqueue *newrq, struct task_struct *seedTask)
-{
+void initschedule(struct runqueue *newrq, struct task_struct *seedTask) {
 	seedTask->next = seedTask->prev = seedTask;
 	newrq->head = seedTask;
 	newrq->nr_running++;
@@ -58,12 +57,8 @@ void initschedule(struct runqueue *newrq, struct task_struct *seedTask)
 * was allocated when setting up the runqueu.
 * It SHOULD NOT free the runqueue itself.
 */
-void killschedule()
-{
+void killschedule() {
 	return;
-}
-
-void print_me(struct task_struct *curr){
 }
 
 
@@ -90,8 +85,7 @@ void print_rq () {
 /* schedule
 * Gets the next task in the queue
 */
-void schedule()
-{
+void schedule() {
 	static struct task_struct *nxt = NULL;
 	struct task_struct *curr;
 
@@ -100,7 +94,7 @@ void schedule()
 
 
 	printf("In schedule\n");
-	print_rq();
+
 
 	current->need_reschedule = 0; /* Always make sure to reset that, in case *
 	* we entered the scheduler because current*
@@ -112,11 +106,13 @@ void schedule()
 	}
 	else {
 
-		curr = nxt;
-		nxt = nxt->next;
-		if (nxt == rq->head)    /* Do this to always skip init at the head */
-		nxt = nxt->next;	/* of the queue, whenever there are other  */
+		//ROUND ROBIN
+		//curr = nxt;
+		//nxt = nxt->next;
+		//if (nxt == rq->head)    /* Do this to always skip init at the head */
+		//nxt = nxt->next;	/* of the queue, whenever there are other  */
 		/* processes available					   */
+
 
 		// keep previous values
 		tmp_burst = current->burst;
@@ -131,13 +127,19 @@ void schedule()
 		current->exp_burst = calc_exp_burst(current);
 		current->goodness = calc_goodness(current);
 
+		print_rq();
+		curr = Sjf_algo();
+		printf ("Sjf Complete\n");
+
 		if (curr != current){
+			printf ("New task different from current\n");
 			context_switch(curr);
 
 			// calc start time of current task
 			current->process_start_time = start_time();
 		}
 		else{
+			printf ("Current remains\n");
 			// Restore old values
 			current->waiting_in_rq = tmp_waiting_in_rq;
 			current->burst = tmp_burst;
@@ -156,8 +158,7 @@ void schedule()
 /* sched_fork
 * Sets up schedule info for a newly forked task
 */
-void sched_fork(struct task_struct *p)
-{
+void sched_fork(struct task_struct *p) {
 	p->time_slice = 100;
 
 	// Initialize values to zero
@@ -172,8 +173,7 @@ void sched_fork(struct task_struct *p)
 * Updates information and priority
 * for the task that is currently running.
 */
-void scheduler_tick(struct task_struct *p)
-{
+void scheduler_tick(struct task_struct *p) {
 	schedule();
 }
 
@@ -182,8 +182,7 @@ void scheduler_tick(struct task_struct *p)
 * that is waking up for the first time
 * (being created).
 */
-void wake_up_new_task(struct task_struct *p)
-{
+void wake_up_new_task(struct task_struct *p) {
 	p->next = rq->head->next;
 	p->prev = rq->head;
 	p->next->prev = p;
@@ -196,8 +195,7 @@ void wake_up_new_task(struct task_struct *p)
 * Activates a task that is being woken-up
 * from sleeping.
 */
-void activate_task(struct task_struct *p)
-{
+void activate_task(struct task_struct *p) {
 	p->next = rq->head->next;
 	p->prev = rq->head;
 	p->next->prev = p;
@@ -213,8 +211,7 @@ void activate_task(struct task_struct *p)
 * Removes a running task from the scheduler to
 * put it to sleep.
 */
-void deactivate_task(struct task_struct *p)
-{
+void deactivate_task(struct task_struct *p) {
 	// lost cpu because of system_call
 	p->waiting_in_rq = calc_waiting_time_in_rq(p);
 	p->prev->next = p->next;
