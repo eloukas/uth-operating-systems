@@ -23,32 +23,32 @@ struct task_struct
 	unsigned int time_slice;				/* Timeslice values */
 	enum sleep_type sleep_type;				/* What type of sleep task is in */
 	int need_reschedule;					/* Flag, set if task needs to
-											   have schedule called */
+	have schedule called */
 	struct task_struct *prev, *next;	/* Used to link the task struct in the
-										   runqueue. Make sure to set them to
-										   NULL when the process is not in the
-										   runqueue */
-/* ---------------- Do NOT Touch END-------------- */
+	runqueue. Make sure to set them to
+	NULL when the process is not in the
+	runqueue */
+	/* ---------------- Do NOT Touch END-------------- */
 
 	double burst;
 	double exp_burst;
 	double goodness;
 	double waiting_in_rq;
-	double process_start_time; 
+	double process_start_time;
 
 };
 
 /* runqueue */
 struct runqueue {
-    unsigned long    nr_running;			/* number of runnable tasks */
+	unsigned long    nr_running;			/* number of runnable tasks */
 	struct task_struct *head;
 };
 
 /*----------------------- System Calls ------------------------------*/
 /* These calls are provided by the VM for your
- * convenience, and mimic system calls provided
- * normally by Linux
- */
+* convenience, and mimic system calls provided
+* normally by Linux
+*/
 void context_switch(struct task_struct *next);
 unsigned long long sched_clock();
 

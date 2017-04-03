@@ -12,27 +12,27 @@ extern struct runqueue *rq;
 //Find min expected burst and max waiting time in rq
 void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq){
 
-        struct task_struct *curr;
+    struct task_struct *curr;
 
-        //traverse the whole list and find the min, max
-        curr = (rq->head)->next;
+    //traverse the whole list and find the min, max
+    curr = (rq->head)->next;
+    *max_waiting_in_rq = curr->waiting_in_rq;
+    *min_exp_burst = curr->exp_burst;
+
+    curr = curr->next;
+
+    while (curr != rq->head) {
+        if (curr->waiting_in_rq < *max_waiting_in_rq)
         *max_waiting_in_rq = curr->waiting_in_rq;
+
+        if (curr->exp_burst < *min_exp_burst)
         *min_exp_burst = curr->exp_burst;
 
         curr = curr->next;
+    }
+    *max_waiting_in_rq = ((sched_clock()/DIVIDE_CONST) - *max_waiting_in_rq);
 
-        while (curr != rq->head) {
-            if (curr->waiting_in_rq < *max_waiting_in_rq)
-                *max_waiting_in_rq = curr->waiting_in_rq;
-
-            if (curr->exp_burst < *min_exp_burst)
-                *min_exp_burst = curr->exp_burst;
-
-            curr = curr->next;
-        }
-        *max_waiting_in_rq = ((sched_clock()/DIVIDE_CONST) - *max_waiting_in_rq);
-
-        printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock()/DIVIDE_CONST);
+    printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock()/DIVIDE_CONST);
 }
 
 /*###################################### END ######################################################*/
@@ -44,7 +44,7 @@ void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq
 
 // Returns max{last_running_time,last_waiting_time_in_runqueue}
 double calc_waiting_time_in_rq(struct task_struct *current){
-    
+
     double curr_time;
 
     curr_time = sched_clock()/DIVIDE_CONST;
@@ -57,7 +57,7 @@ double calc_waiting_time_in_rq(struct task_struct *current){
 
 // Calculation of burst
 double calc_burst(struct task_struct *current){
-    
+
     double curr_time = sched_clock()/DIVIDE_CONST;
 
     return curr_time - current->process_start_time;
@@ -87,4 +87,3 @@ double start_time(){
 }
 
 /*################################# END ####################################*/
-
