@@ -3,6 +3,8 @@
 
 #include "schedule.h"
 
+struct task_struct * Sjf_algo ();
+
 double calc_waiting_time_in_rq(struct task_struct *current);
 double calc_burst(struct task_struct *current);
 double calc_exp_burst(struct task_struct *current);

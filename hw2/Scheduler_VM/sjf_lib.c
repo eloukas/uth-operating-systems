@@ -9,6 +9,30 @@ extern struct runqueue *rq;
 
 /*########################## Functions aboutRq (traversal,min,max etc..) ##########################*/
 
+//Find the process with minimum exp_burst
+struct task_struct * Sjf_algo () {
+
+    struct task_struct * curr;
+    struct task_struct * tmp;
+    double min_exp_burst;
+
+    curr = (rq->head)->next;
+    min_exp_burst = curr->exp_burst;
+    tmp = curr;
+    curr = curr->next;
+
+    while (curr != rq->head) {
+        if (curr->exp_burst < min_exp_burst) {
+            min_exp_burst = curr->exp_burst;
+            tmp = curr;
+        }
+        curr = curr->next;
+    }
+
+    return tmp;
+}
+
+
 //Find min expected burst and max waiting time in rq
 void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq){
 
@@ -85,5 +109,7 @@ double start_time(){
 
     return sched_clock()/DIVIDE_CONST;
 }
+
+
 
 /*################################# END ####################################*/
