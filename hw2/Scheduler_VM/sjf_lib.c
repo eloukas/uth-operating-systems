@@ -30,9 +30,9 @@ void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq
 
             curr = curr->next;
         }
-        *max_waiting_in_rq = ((sched_clock()/1000000) - *max_waiting_in_rq);
+        *max_waiting_in_rq = ((sched_clock()/DIVIDE_CONST) - *max_waiting_in_rq);
 
-        printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock()/1000000);
+        printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock()/DIVIDE_CONST);
 }
 
 /*###################################### END ######################################################*/

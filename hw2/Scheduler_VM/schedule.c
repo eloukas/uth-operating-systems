@@ -183,6 +183,8 @@ void activate_task(struct task_struct *p)
 	p->prev->next = p;
 
 	rq->nr_running++;
+
+    // last time it joins rq
     p->waiting_in_rq = calc_waiting_time_in_rq(p);
 }
 
@@ -192,6 +194,8 @@ void activate_task(struct task_struct *p)
  */
 void deactivate_task(struct task_struct *p)
 {
+    // lost cpu because of system_call
+    p->waiting_in_rq = calc_waiting_time_in_rq(p);
 	p->prev->next = p->next;
 	p->next->prev = p->prev;
 	p->next = p->prev = NULL; /* Make sure to set them to NULL *
