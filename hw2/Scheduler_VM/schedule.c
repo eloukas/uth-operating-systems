@@ -95,6 +95,10 @@ void schedule()
 	static struct task_struct *nxt = NULL;
 	struct task_struct *curr;
 
+    //tmp variables in case sjf returns the same process
+    double tmp_burst,tmp_exp_burst,tmp_goodness,tmp_waiting_in_rq,tmp_process_start_time;
+
+
 	printf("In schedule\n");
 	print_rq();
 
@@ -114,16 +118,33 @@ void schedule()
 			nxt = nxt->next;	/* of the queue, whenever there are other  */
 								/* processes available					   */
  
+        // keep previous values
+        tmp_burst = current->burst;
+        tmp_exp_burst = current->exp_burst;
+        tmp_goodness = current->goodness;
+        tmp_waiting_in_rq = current->waiting_in_rq;
+        tmp_process_start_time = current->process_start_time;
+
 		// Calc burst,goodness etc.. 
         current->waiting_in_rq = calc_waiting_time_in_rq(current);
 		current->burst = calc_burst(current);
 		current->exp_burst = calc_exp_burst(current);    
         current->goodness = calc_goodness(current);
         
-        context_switch(curr);
+        if (curr != current){
+            context_switch(curr);
 
-		// calc start time of current task
-		current->process_start_time = start_time();
+		    // calc start time of current task
+		    current->process_start_time = start_time();
+        }
+        else{
+    		// Restore old values
+            current->waiting_in_rq = tmp_waiting_in_rq;
+		    current->burst = tmp_burst;
+		    current->exp_burst = tmp_exp_burst;    
+            current->goodness = tmp_goodness;
+            current->process_start_time = tmp_process_start_time;
+        }
 	}
     print_rq();
     printf("Running process: %s\n", current->thread_info->processName);
