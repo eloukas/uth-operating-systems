@@ -119,13 +119,15 @@ void schedule() {
 		tmp_waiting_in_rq = current->waiting_in_rq;
 		tmp_process_start_time = current->process_start_time;
 
-        // Calc burst,goodness etc..
-        current->waiting_in_rq = calc_waiting_time_in_rq(current);
-		current->burst = calc_burst(current);
-		current->exp_burst = calc_exp_burst(current);
+		if (current != rq->head){
+        	// Calc burst,goodness etc..
+        	current->waiting_in_rq = calc_waiting_time_in_rq(current);
+			current->burst = calc_burst(current);
+			current->exp_burst = calc_exp_burst(current);
+		}
 		calc_goodness();
 
-		print_rq();
+		//print_rq();
 		curr = Sjf_algo();
 		printf ("Sjf Complete\n");
 
@@ -147,7 +149,7 @@ void schedule() {
 	}
 	print_rq();
 	printf("Running process: %s\n", current->thread_info->processName);
-	printf("~!!!!Done with scheduling!!!!~\n");
+	printf("~!!!!Done with scheduling!!!!~\n\n\n\n");
 
 }
 
