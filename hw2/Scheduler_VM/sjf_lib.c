@@ -1,7 +1,6 @@
 #include "schedule.h"
 #include <stdio.h>
 
-#define DIVIDE_CONST 1000000
 #define FACTOR 0.5
 
 extern struct runqueue *rq;
@@ -55,9 +54,9 @@ void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq
         }
         curr = curr->next;
     }
-    *max_waiting_in_rq = ((sched_clock()/DIVIDE_CONST) - *max_waiting_in_rq);
+    *max_waiting_in_rq = (sched_clock() - *max_waiting_in_rq);
 
-    printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock()/DIVIDE_CONST);
+    printf("Min exp_burst: %4.2lf\nMax wait_in_rq: %4.2lf\nSched_clock: %lld\n",*min_exp_burst,*max_waiting_in_rq, sched_clock());
 }
 
 /*###################################### END ######################################################*/
@@ -68,22 +67,22 @@ void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq
 
 
 // Returns max{last_running_time,last_waiting_time_in_runqueue}
-double calc_waiting_time_in_rq(struct task_struct *current){
+double calc_waiting_time_in_rq(struct task_struct *curr){
 
     double curr_time;
 
-    curr_time = sched_clock()/DIVIDE_CONST;
+    curr_time = sched_clock() ;
 
-    if (curr_time > current->waiting_in_rq){
+    if (curr_time > curr->waiting_in_rq){
         return curr_time;
     }
-    return current->waiting_in_rq;
+    return curr->waiting_in_rq;
 }
 
 // Calculation of burst
 double calc_burst(struct task_struct *current){
 
-    double curr_time = sched_clock()/DIVIDE_CONST;
+    double curr_time = sched_clock();
 
     return curr_time - current->process_start_time;
 }
@@ -104,13 +103,13 @@ void calc_goodness(){
     min_burst_max_waiting_in_rq(&min_exp_burst,&max_waiting_in_rq);
 
     for(curr = rq->head->next; curr != rq->head; curr=curr->next){
-        curr->goodness = ((1 + curr->exp_burst) / (1 + min_exp_burst)) * ((1 + max_waiting_in_rq) / (1 + curr->waiting_in_rq));
+        curr->goodness = ((1 + curr->exp_burst) / (1 + min_exp_burst)) * ((1 + max_waiting_in_rq) / (1 + (sched_clock() - curr->waiting_in_rq)));
     }
 }
 
 // Return starting time of process
 double start_time(){
-    return sched_clock()/DIVIDE_CONST;
+    return sched_clock();
 }
 
 

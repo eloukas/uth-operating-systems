@@ -66,14 +66,14 @@ void print_rq () {
 	struct task_struct *curr;
 
 	printf("---------------------------------------------------------------------------------\n");
-	printf("%-25s%-10s%-25s%-10s\n", "Name","Burst","Expected Burst","Goodness");
+	printf("%-25s%-20s%-20s%-20s%-20s\n", "Name","Burst","Expected Burst","Goodness","Waiting in rq");
 	curr = rq->head;
 	if (curr){
-		printf("%-25s%-10.2lf%-25.2lf%-10.2lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness);
+		printf("%-25s%-20lf%-20lf%-20lf%-20lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
 	}
 	while(curr->next != rq->head) {
 		curr = curr->next;
-		printf("%-25s%-10.2lf%-25.2lf%-10.2lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness);
+		printf("%-25s%-20lf%-20lf%-20lf%-20lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
 	};
 	printf("---------------------------------------------------------------------------------\n");
 	printf("\n");
@@ -113,26 +113,24 @@ void schedule() {
 		//nxt = nxt->next;	/* of the queue, whenever there are other  */
 		/* processes available					   */
 
-
 		// keep previous values
 		tmp_burst = current->burst;
 		tmp_exp_burst = current->exp_burst;
-		tmp_goodness = current->goodness;
 		tmp_waiting_in_rq = current->waiting_in_rq;
 		tmp_process_start_time = current->process_start_time;
 
-		// Calc burst,goodness etc..
-		current->waiting_in_rq = calc_waiting_time_in_rq(current);
+        // Calc burst,goodness etc..
+        current->waiting_in_rq = calc_waiting_time_in_rq(current);
 		current->burst = calc_burst(current);
 		current->exp_burst = calc_exp_burst(current);
-		current->goodness = calc_goodness(current);
+		calc_goodness();
 
 		print_rq();
 		curr = Sjf_algo();
 		printf ("Sjf Complete\n");
 
 		if (curr != current){
-			printf ("New task different from current\n");
+        	printf ("New task different from current\n");
 			context_switch(curr);
 
 			// calc start time of current task
@@ -144,7 +142,6 @@ void schedule() {
 			current->waiting_in_rq = tmp_waiting_in_rq;
 			current->burst = tmp_burst;
 			current->exp_burst = tmp_exp_burst;
-			current->goodness = tmp_goodness;
 			current->process_start_time = tmp_process_start_time;
 		}
 	}
@@ -160,13 +157,6 @@ void schedule() {
 */
 void sched_fork(struct task_struct *p) {
 	p->time_slice = 100;
-
-	// Initialize values to zero
-	p->burst=0;
-	p->exp_burst=0;
-	p->goodness=0;
-	p->process_start_time=0;
-	p->waiting_in_rq=0;
 }
 
 /* scheduler_tick
@@ -187,6 +177,13 @@ void wake_up_new_task(struct task_struct *p) {
 	p->prev = rq->head;
 	p->next->prev = p;
 	p->prev->next = p;
+
+	// Initialize values to zero
+	p->burst=0;
+	p->exp_burst=0;
+	p->goodness=0;
+	p->process_start_time=0;
+	p->waiting_in_rq = sched_clock();
 
 	rq->nr_running++;
 }
