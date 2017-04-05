@@ -46,12 +46,13 @@ void min_burst_max_waiting_in_rq(double *min_exp_burst,double *max_waiting_in_rq
     curr = curr->next;
 
     while (curr != rq->head) {
-        if (curr->waiting_in_rq < *max_waiting_in_rq)
-        *max_waiting_in_rq = curr->waiting_in_rq;
+        if (curr->waiting_in_rq < *max_waiting_in_rq){
+            *max_waiting_in_rq = curr->waiting_in_rq;
+        }
 
-        if (curr->exp_burst < *min_exp_burst)
-        *min_exp_burst = curr->exp_burst;
-
+        if (curr->exp_burst < *min_exp_burst){
+            *min_exp_burst = curr->exp_burst;
+        }
         curr = curr->next;
     }
     *max_waiting_in_rq = ((sched_clock()/DIVIDE_CONST) - *max_waiting_in_rq);
@@ -93,20 +94,22 @@ double calc_exp_burst(struct task_struct *current){
     return (current->burst + FACTOR*current->exp_burst)/(1 + FACTOR);
 }
 
-// Calculation of goodness
-double calc_goodness(struct task_struct *current){
+// Goodness calculation of all processes
+void calc_goodness(){
 
     double min_exp_burst,max_waiting_in_rq;
+    struct task_struct *curr;
 
     // find min expected burst, max waiting time in rq
     min_burst_max_waiting_in_rq(&min_exp_burst,&max_waiting_in_rq);
 
-    return ((1 + current->exp_burst) / (1 + min_exp_burst)) * ((1 + max_waiting_in_rq) / (1 + current->waiting_in_rq));
+    for(curr = rq->head->next; curr != rq->head; curr=curr->next){
+        curr->goodness = ((1 + curr->exp_burst) / (1 + min_exp_burst)) * ((1 + max_waiting_in_rq) / (1 + curr->waiting_in_rq));
+    }
 }
 
 // Return starting time of process
 double start_time(){
-
     return sched_clock()/DIVIDE_CONST;
 }
 
