@@ -13,16 +13,16 @@ struct task_struct * Sjf_algo () {
 
     struct task_struct * curr;
     struct task_struct * tmp;
-    double min_goodness;
+    double min_exp_burst;
 
     curr = (rq->head)->next;
-    min_goodness = curr->goodness;
+    min_exp_burst = curr->exp_burst;
     tmp = curr;
     curr = curr->next;
 
     while (curr != rq->head) {
-        if (curr->goodness < min_goodness) {
-            min_goodness = curr->goodness;
+        if (curr->exp_burst < min_exp_burst) {
+            min_exp_burst = curr->exp_burst;
             tmp = curr;
         }
         curr = curr->next;
