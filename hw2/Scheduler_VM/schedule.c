@@ -93,7 +93,7 @@ void schedule() {
 	double tmp_burst,tmp_exp_burst,tmp_goodness,tmp_waiting_in_rq,tmp_process_start_time;
 
 
-	printf("In schedule\n");
+	//printf("In schedule\n");
 
 
 	current->need_reschedule = 0; /* Always make sure to reset that, in case *
@@ -129,17 +129,17 @@ void schedule() {
 
 		//print_rq();
 		curr = Sjf_algo();
-		printf ("Sjf Complete\n");
+		//printf ("Sjf Complete\n");
 
 		if (curr != current){
-        	printf ("New task different from current\n");
+        	//printf ("New task different from current\n");
 			context_switch(curr);
 
 			// calc start time of current task
 			current->process_start_time = start_time();
 		}
 		else{
-			printf ("Current remains\n");
+			//printf ("Current remains\n");
 			// Restore old values
 			current->waiting_in_rq = tmp_waiting_in_rq;
 			current->burst = tmp_burst;
@@ -147,8 +147,8 @@ void schedule() {
 			current->process_start_time = tmp_process_start_time;
 		}
 	}
-	print_rq();
-	printf("Running process: %s\n", current->thread_info->processName);
+	//print_rq();
+	printf("Next process: %s\n", current->thread_info->processName);
 	printf("~!!!!Done with scheduling!!!!~\n\n\n\n");
 
 }
