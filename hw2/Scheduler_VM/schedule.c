@@ -64,18 +64,15 @@ void killschedule() {
 
 void print_rq () {
 	struct task_struct *curr;
-
-	printf("---------------------------------------------------------------------------------\n");
-	printf("%-25s%-20s%-20s%-20s%-20s\n", "Name","Burst","Expected Burst","Goodness","Waiting in rq");
+	
+	printf("Rq: \n");
 	curr = rq->head;
-	if (curr){
-		printf("%-25s%-20lf%-20lf%-20lf%-20lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
-	}
+	if (curr)
+		printf("%p", curr);
 	while(curr->next != rq->head) {
 		curr = curr->next;
-		printf("%-25s%-20lf%-20lf%-20lf%-20lf\n", curr->thread_info->processName,curr->burst,curr->exp_burst,curr->goodness,curr->waiting_in_rq);
+		printf(", %p", curr);
 	};
-	printf("---------------------------------------------------------------------------------\n");
 	printf("\n");
 }
 
@@ -94,6 +91,7 @@ void schedule() {
 
 
 	//printf("In schedule\n");
+	//print_rq();
 
 
 	current->need_reschedule = 0; /* Always make sure to reset that, in case *
@@ -148,8 +146,8 @@ void schedule() {
 		}
 	}
 	//print_rq();
-	printf("Next process: %s\n", current->thread_info->processName);
-	printf("~!!!!Done with scheduling!!!!~\n\n\n\n");
+	//printf("Next process: %s\n",current->thread_info->processName);
+	//printf("~!!!!Done with scheduling!!!!~\n\n\n\n");
 
 }
 
