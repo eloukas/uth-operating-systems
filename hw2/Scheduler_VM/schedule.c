@@ -104,13 +104,6 @@ void schedule() {
 	}
 	else {
 
-		//ROUND ROBIN
-		//curr = nxt;
-		//nxt = nxt->next;
-		//if (nxt == rq->head)    /* Do this to always skip init at the head */
-		//nxt = nxt->next;	/* of the queue, whenever there are other  */
-		/* processes available					   */
-
 		// keep previous values
 		tmp_burst = current->burst;
 		tmp_exp_burst = current->exp_burst;
@@ -125,19 +118,15 @@ void schedule() {
 		}
 		calc_goodness();
 
-		//print_rq();
 		curr = Sjf_algo();
-		//printf ("Sjf Complete\n");
 
 		if (curr != current){
-        	//printf ("New task different from current\n");
 			context_switch(curr);
 
 			// calc start time of current task
 			current->process_start_time = start_time();
 		}
 		else{
-			//printf ("Current remains\n");
 			// Restore old values
 			current->waiting_in_rq = tmp_waiting_in_rq;
 			current->burst = tmp_burst;
@@ -145,10 +134,6 @@ void schedule() {
 			current->process_start_time = tmp_process_start_time;
 		}
 	}
-	//print_rq();
-	//printf("Next process: %s\n",current->thread_info->processName);
-	//printf("~!!!!Done with scheduling!!!!~\n\n\n\n");
-
 }
 
 
