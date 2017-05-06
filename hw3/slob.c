@@ -87,6 +87,7 @@ typedef s16 slobidx_t;
 typedef s32 slobidx_t;
 #endif
 
+
 struct slob_block {
 	slobidx_t units;
 };
@@ -214,52 +215,121 @@ static void slob_free_pages(void *b, int order)
 /*
  * Allocate a slob block within a given slob_page sp.
  */
+/*
+ * Almost all variables are duplicated like this : variableX => best_variableX
+ * This helps us not having so many "ifdef-endif" statements.
+ * We let the loop run with the initial variables, then update the values to the "best" ones
+ * so it works on both Algorithms.
+ * 
+ */
+  
 static void *slob_page_alloc(struct page *sp, size_t size, int align)
 {
+	
+  /* 
+   * Arguments:
+   * sp is a pointer to the current page
+   * size is the size requested for the block
+   * align = used for delta and fragmentation..os things
+   */
+  
+	//Variables
 	slob_t *prev, *cur, *aligned = NULL;
 	int delta = 0, units = SLOB_UNITS(size);
+	
+	//why do we have these variables?read function explaining!
+	slob_t *best_prev = NULL;
+	slob_t *best_cur = NULL;
+	slob_t *best_aligned = NULL;
+	int best_delta = 0; 
+	slobidx_t best_fit = 0; //variable that keeps the minimum space
 
+	//traverse each block in the list
 	for (prev = NULL, cur = sp->freelist; ; prev = cur, cur = slob_next(cur)) {
-		slobidx_t avail = slob_units(cur);
+		slobidx_t avail = slob_units(cur); //available space in the block
 
-		if (align) {
+		if (align) { // OS things..do not change.
 			aligned = (slob_t *)ALIGN((unsigned long)cur, align);
 			delta = aligned - cur;
 		}
+		//print 
+		
+		/*
+		 * if there is enough room, then get the block.
+		 * we need to get the BEST block for BESTFIT algorithm
+		 */
+#ifdef BESTFIT
+		if ( (avail >= units + delta) && //if it can handle the request 
+			( (avail - (units + delta ) < best_fit ) || best_cur == NULL ) ) { 
+			//if it's better than the previous one found (OR if it's the first one being scanned)
+			
+#else //FIRSTFIT
 		if (avail >= units + delta) { /* room enough? */
+#endif
+		
+			//Update all "best" variables with the right values
+			best_prev = prev;
+			best_cur = cur;
+			best_aligned = aligned;
+			best_delta = delta;
+			best_fit = avail - (units + delta);	 //current one	
+			
+#ifdef BESTFIT	/*we need to return best_fit node block when we are done checking the list
+					reminder: we are inside a for loop
+				*/
+		}
+		if (slob_last(best_cur)){
+			if (best_cur != NULL) {
+#endif
+			
 			slob_t *next;
+			
+			//
+			slob_t best_next = NULL;
+			
+			slobidx_t best_avail = slob_units(best_cur); 
+			//slob_units = macro that returns the size of a slob block
+			
+			
+			//Change *every* variable to work for both BESTFIT and FIRSTFIT variables.
 
-			if (delta) { /* need to fragment head to align? */
-				next = slob_next(cur);
-				set_slob(aligned, avail - delta, next);
-				set_slob(cur, delta, aligned);
-				prev = cur;
-				cur = aligned;
-				avail = slob_units(cur);
+			if (best_delta) { /* need to fragment head to align? */
+				best_next = slob_next(best_cur);
+				set_slob(best_aligned, best_avail - best_delta, best_next);
+				set_slob(best_cur, best_delta, best_aligned);
+				best_prev = best_cur;
+				best_cur = best_aligned;
+				best_avail = slob_units(best_cur);
 			}
 
-			next = slob_next(cur);
-			if (avail == units) { /* exact fit? unlink. */
-				if (prev)
-					set_slob(prev, slob_units(prev), next);
+			best_next = slob_next(best_cur);
+			if (best_avail == units) { /* exact fit? unlink. */
+				if (best_prev)
+					set_slob(best_prev, slob_units(best_prev), best_next);
 				else
-					sp->freelist = next;
+					sp->freelist = best_next;
 			} else { /* fragment */
-				if (prev)
-					set_slob(prev, slob_units(prev), cur + units);
+				if (best_prev)
+					set_slob(best_prev, slob_units(best_prev), best_cur + units);
 				else
-					sp->freelist = cur + units;
-				set_slob(cur + units, avail - units, next);
+					sp->freelist = best_cur + units;
+				set_slob(best_cur + units, best_avail - units, best_next);
 			}
 
 			sp->units -= units;
-			if (!sp->units)
+			if (!sp->units){
 				clear_slob_page_free(sp);
-			return cur;
+			}
+			return best_cur; //we use the "best" variable now, not the old one.
+
+#ifdef BESTFIT
+			}
+#else	//FIRSTFIT	
 		}
-		if (slob_last(cur))
+		if (slob_last(cur)){ 
+#endif
 			return NULL;
-	}
+	} }
 }
 
 /*
