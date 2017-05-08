@@ -1,7 +1,9 @@
 #include <linux/kernel.h>
 #include <linux/syscalls.h>
+#include <linux/mm/measurement.h>
 
-SYSCALL_DEFINE0(slob_get_total_alloc_mem){
+extern unsigned long total_free_mem;
 
-    return(0);
+SYSCALL_DEFINE0(slob_get_total_free_mem){
+    return(total_free_mem);
 }
