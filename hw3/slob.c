@@ -332,6 +332,56 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 	} }
 }
 
+
+
+/*
+ * Returns the best fitting block size for the given page.
+ * Possible values: 0 (perfect fit), -1 (no block) or positive integer
+ */
+static int best_fit_page(struct slob_page *sp, size_t size, int align){
+
+    slob_t *prev, *cur, *aligned = NULL;
+    int delta = 0, units = SLOB_UNITs(size);
+
+    slobidx_t best = -1;
+    slob_t *best_cur = NULL;
+
+
+    // traversal all blocks to find the best fit
+    for (prev = NULL, cur = sp->free; ; prev = cur, cur = slob_next(cur)){
+        
+        //available free slob units
+        slobidx avail = slob_units(cur);
+
+
+        if (align){
+            aligned = (slob_t *)ALIGN((unsigned long)cur, align);
+            delta = aligned - cur;
+        }
+
+        // main check for best block size
+        if (avail > units + delta && (best_cur == NULL || avail - (units + delta < best))){
+            best_cur = cur;
+            best = avail - (units + delta);
+            if (best==0){
+                return 0;
+            }
+        }
+
+        // End of slob block list, return best fit block for this page
+        if (slob_last(cur)){
+            if (best_cur != NULL){
+                return best
+            }
+            else{
+                return -1;
+            }
+        }
+    } // loop end
+}
+
+
+
 /*
  * slob_alloc: entry point into the slob allocator.
  */
