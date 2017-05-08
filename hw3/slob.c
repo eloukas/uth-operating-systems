@@ -56,6 +56,7 @@
  * in order to prevent random node placement.
  */
 
+#define BESTFIT
 #include <linux/kernel.h>
 #include <linux/slab.h>
 
@@ -411,14 +412,14 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
     slob_t *best_cur = NULL;
 
 
-    // traversal all blocks to find the best fit
+    // traversal of all blocks to find the best fit
     for (prev = NULL, cur = sp->free; ; prev = cur, cur = slob_next(cur)){
         
         //available free slob units
         slobidx avail = slob_units(cur);
 
 
-        if (align){
+        if (align){ 
             aligned = (slob_t *)ALIGN((unsigned long)cur, align);
             delta = aligned - cur;
         }
@@ -427,7 +428,8 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
         if (avail > units + delta && (best_cur == NULL || avail - (units + delta < best))){
             best_cur = cur;
             best = avail - (units + delta);
-            if (best==0){
+			
+            if (best==0){ //exact fit
                 return 0;
             }
         }
@@ -435,10 +437,10 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
         // End of slob block list, return best fit block for this page
         if (slob_last(cur)){
             if (best_cur != NULL){
-                return best
+                return best //positive integer
             }
             else{
-                return -1;
+                return -1; //no block available, search another page..
             }
         }
     } // loop end
@@ -497,7 +499,7 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
             best_sp = sp;
             break;
         }
-        else if (tmp_fit > 0 && (best_fit==-1 || tmp_fit < best_fit)){
+        else if (tmp_fit > 0 && (best_fit == -1 || tmp_fit < best_fit)){
             best_sp = sp;
             best_fit = tmp_fit;
         }
