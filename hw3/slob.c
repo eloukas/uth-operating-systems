@@ -264,7 +264,7 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 		}
 		
         // print each block size
-        if (print_counter == 6000){
+        if (print_counter > 6000){
             printk(" %u", avail - delta);
         } 
 		
@@ -332,11 +332,19 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 				clear_slob_page_free(sp);
 			}
 
+		
+			if (print_counter > 6000){
+				printk("\nslob_alloc: Best Fit:  %u\n", best_avail);
+			}
+			
 			return best_cur; //we use the "best" variable now, not the old one.
 
 
 			}
-
+			
+			if (print_counter > 6000){
+				printk("\nslob_alloc: Best Fit: None\n");
+			}
 			return NULL;
 		}
 		
