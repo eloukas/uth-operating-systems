@@ -393,6 +393,9 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 	slob_t *b = NULL;
 	unsigned long flags;
 
+    int best_fit = -1;
+    struct page *best_sp = NULL;
+
 	if (size < SLOB_BREAK1)
 		slob_list = &free_slob_small;
 	else if (size < SLOB_BREAK2)
@@ -403,6 +406,8 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 	spin_lock_irqsave(&slob_lock, flags);
 	/* Iterate through each partially free page, try to find room */
 	list_for_each_entry(sp, slob_list, list) {
+
+        int tmp_fit = -1;
 #ifdef CONFIG_NUMA
 		/*
 		 * If there's a node specification, search for a partial
@@ -415,20 +420,27 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 		if (sp->units < SLOB_UNITS(size))
 			continue;
 
-		/* Attempt to alloc */
-		prev = sp->list.prev;
-		b = slob_page_alloc(sp, size, align);
-		if (!b)
-			continue;
+        // calc fit size of current page
+        fit = best_fit_page(sp, size, align);
 
-		/* Improve fragment distribution and reduce our average
-		 * search time by starting our next search here. (see
-		 * Knuth vol 1, sec 2.5, pg 449) */
-		if (prev != slob_list->prev &&
-				slob_list->next != prev->next)
-			list_move_tail(slob_list, prev->next);
-		break;
-	}
+        if (fit == 0){ //exact fit!
+            best_sp = sp;
+            break;
+        }
+        else if (fit > 0 && (best_fit==-1 || fit < best_fit)){
+            best_sp = sp;
+            best_fit = fit;
+        }
+        continue;
+    } // end loop
+
+    if (best_fit >= 0){ // found a page!
+        
+        if (best_sp != NULL){ // try to allocate
+            b = slob_page_alloc(best_sp, size, align);
+        }
+    }
+
 	spin_unlock_irqrestore(&slob_lock, flags);
 
 	/* Not enough space: must allocate a new page */
