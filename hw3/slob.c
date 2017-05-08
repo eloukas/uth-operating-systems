@@ -87,6 +87,7 @@ typedef s16 slobidx_t;
 typedef s32 slobidx_t;
 #endif
 
+static unsigned long print_counter = 0;
 
 struct slob_block {
 	slobidx_t units;
@@ -243,6 +244,11 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 	slob_t *best_aligned = NULL;
 	int best_delta = 0; 
 	slobidx_t best_fit = 0; //variable that keeps the minimum space
+    
+    if (print_counter > 6000){
+        printk("slob_Request: %u\n", units);
+        printk("slob_alloc: Candidate blocks size:");
+    }
 
 	//traverse each block in the list
 	for (prev = NULL, cur = sp->freelist; ; prev = cur, cur = slob_next(cur)) {
@@ -252,7 +258,11 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 			aligned = (slob_t *)ALIGN((unsigned long)cur, align);
 			delta = aligned - cur;
 		}
-		//print 
+		
+        // print each block size
+        if (print_counter == 6000){
+            printk(" %u", avail - delta);
+        } 
 		
 		/*
 		 * if there is enough room, then get the block.
@@ -320,6 +330,7 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 			if (!sp->units){
 				clear_slob_page_free(sp);
 			}
+
 			return best_cur; //we use the "best" variable now, not the old one.
 
 #ifdef BESTFIT
@@ -387,6 +398,12 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
  */
 static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 {
+
+    if (print_counter > 6000){
+        print_counter = 0;
+    }
+    print_counter++;
+
 	struct page *sp;
 	struct list_head *prev;
 	struct list_head *slob_list;
@@ -421,15 +438,15 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 			continue;
 
         // calc fit size of current page
-        fit = best_fit_page(sp, size, align);
+        tmp_fit = best_fit_page(sp, size, align);
 
-        if (fit == 0){ //exact fit!
+        if (tmp_fit == 0){ //exact fit!
             best_sp = sp;
             break;
         }
-        else if (fit > 0 && (best_fit==-1 || fit < best_fit)){
+        else if (tmp_fit > 0 && (best_fit==-1 || tmp_fit < best_fit)){
             best_sp = sp;
-            best_fit = fit;
+            best_fit = tmp_fit;
         }
         continue;
     } // end loop
