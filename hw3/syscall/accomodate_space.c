@@ -5,6 +5,7 @@
 int main( int argc, char *argv[] ){
 
 	int *pointer;
+    inn i;
 	pointer = (int*)malloc(sizeof(int)*1337);
 
 	//Declare 5 arrays of 'char' variables
@@ -19,7 +20,7 @@ int main( int argc, char *argv[] ){
 
 	
 	//Do this 100 times
-	for( int i=0; i < 100; i++){
+	for(i=0; i < 100; i++){
 		
 		//Attempt to resize the memory block pointed to by 'pointer' for i*1337 bytes
 		pointer = (int*)realloc(pointer,(i*1337) );

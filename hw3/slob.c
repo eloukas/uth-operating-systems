@@ -72,6 +72,7 @@
 #include <trace/events/kmem.h>
 
 #include <linux/atomic.h>
+#include <linux/slob.h>
 
 #include "slab.h"
 /*
@@ -105,6 +106,15 @@ typedef struct slob_block slob_t;
 static LIST_HEAD(free_slob_small);
 static LIST_HEAD(free_slob_medium);
 static LIST_HEAD(free_slob_large);
+
+// 2 functions for syscalls!
+unsigned long get_alloc_mem(){
+    return total_alloc_mem;
+}
+
+unsigned long get_free_mem(){
+    return total_free_mem;
+}
 
 /*
  * slob_page_free: true for pages on free_slob_pages list.
