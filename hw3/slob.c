@@ -418,20 +418,20 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
  * Returns the best fitting block size for the given page.
  * Possible values: 0 (perfect fit), -1 (no block) or positive integer
  */
-static int best_fit_page(struct slob_page *sp, size_t size, int align){
+static int best_fit_page(struct page *sp, size_t size, int align){
 
     slob_t *prev, *cur, *aligned = NULL;
-    int delta = 0, units = SLOB_UNITs(size);
+    int delta = 0, units = SLOB_UNITS(size);
 
     slobidx_t best = -1;
     slob_t *best_cur = NULL;
 
 
     // traversal of all blocks to find the best fit
-    for (prev = NULL, cur = sp->free; ; prev = cur, cur = slob_next(cur)){
+    for (prev = NULL, cur = sp->freelist; ; prev = cur, cur = slob_next(cur)){
 
         //available free slob units
-        slobidx avail = slob_units(cur);
+        slobidx_t avail = slob_units(cur);
 
 
         if (align){
@@ -440,7 +440,7 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
         }
 
         // main check for best block size
-        if (avail > units + delta && (best_cur == NULL || avail - (units + delta < best))){
+        if (avail >= units + delta && (best_cur == NULL || avail - (units + delta < best))){
             best_cur = cur;
             best = avail - (units + delta);
 
@@ -452,7 +452,7 @@ static int best_fit_page(struct slob_page *sp, size_t size, int align){
         // End of slob block list, return best fit block for this page
         if (slob_last(cur)){
             if (best_cur != NULL){
-                return best //positive integer
+                return best; //positive integer
             }
             else{
                 return -1; //no block available, search another page..
@@ -479,11 +479,6 @@ unsigned long calc_free_mem(struct list_head *slob_list){
 static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 {
 
-    if (print_counter > 6000){
-        print_counter = 0;
-    }
-    print_counter++;
-
 	struct page *sp;
 	struct list_head *prev;
 	struct list_head *slob_list;
@@ -492,6 +487,11 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 
     int best_fit = -1;
     struct page *best_sp = NULL;
+
+    if (print_counter > 6000){
+        print_counter = 0;
+    }
+    print_counter++;
 
 	if (size < SLOB_BREAK1)
 		slob_list = &free_slob_small;
@@ -539,7 +539,7 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
     }
 
 	// calculation of total free memory as need it
-	total_free_mem = calc_free_mem(free_slob_small) + calc_free_mem(free_slob_medium) + calc_free_mem(free_slob_large);
+	total_free_mem = calc_free_mem(&free_slob_small) + calc_free_mem(&free_slob_medium) + calc_free_mem(&free_slob_large);
 
 	spin_unlock_irqrestore(&slob_lock, flags);
 
