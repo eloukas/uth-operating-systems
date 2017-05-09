@@ -297,64 +297,62 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 				*/
 		}
 
-		if (slob_last(best_cur)){
+		//if (slob_last(best_cur)){ //check it again
 			if (best_cur != NULL) {
 
-			slob_t *next;
+				slob_t *next = NULL;
 
-			//
-			slob_t best_next = NULL;
+				//
+				slob_t *best_next = NULL;
 
-			slobidx_t best_avail = slob_units(best_cur);
-			//slob_units = macro that returns the size of a slob block
+				slobidx_t best_avail = slob_units(best_cur);
+				//slob_units = macro that returns the size of a slob block
 
 
-			//Change *every* variable to work for both BESTFIT and FIRSTFIT variables.
+				//Change *every* variable to work for both BESTFIT and FIRSTFIT variables.
 
-			if (best_delta) { /* need to fragment head to align? */
+				if (best_delta) { /* need to fragment head to align? */
+					best_next = slob_next(best_cur);
+					set_slob(best_aligned, best_avail - best_delta, best_next);
+					set_slob(best_cur, best_delta, best_aligned);
+					best_prev = best_cur;
+					best_cur = best_aligned;
+					best_avail = slob_units(best_cur);
+				}
+
 				best_next = slob_next(best_cur);
-				set_slob(best_aligned, best_avail - best_delta, best_next);
-				set_slob(best_cur, best_delta, best_aligned);
-				best_prev = best_cur;
-				best_cur = best_aligned;
-				best_avail = slob_units(best_cur);
+				if (best_avail == units) { /* exact fit? unlink. */
+					if (best_prev)
+						set_slob(best_prev, slob_units(best_prev), best_next);
+					else
+						sp->freelist = best_next;
+				} else { /* fragment */
+					if (best_prev)
+						set_slob(best_prev, slob_units(best_prev), best_cur + units);
+					else
+						sp->freelist = best_cur + units;
+					set_slob(best_cur + units, best_avail - units, best_next);
+				}
+
+				sp->units -= units;
+				if (!sp->units){
+					clear_slob_page_free(sp);
+				}
+
+
+				if (print_counter > 6000){
+					printk("\nslob_alloc: Best Fit:  %u\n", best_avail);
+				}
+
+				return best_cur; //returns best block
+
+			}else{
+				if (print_counter > 6000){
+					printk("\nslob_alloc: Best Fit: None\n");
+				}
+				return NULL; //couldn't fit on this page..
 			}
-
-			best_next = slob_next(best_cur);
-			if (best_avail == units) { /* exact fit? unlink. */
-				if (best_prev)
-					set_slob(best_prev, slob_units(best_prev), best_next);
-				else
-					sp->freelist = best_next;
-			} else { /* fragment */
-				if (best_prev)
-					set_slob(best_prev, slob_units(best_prev), best_cur + units);
-				else
-					sp->freelist = best_cur + units;
-				set_slob(best_cur + units, best_avail - units, best_next);
-			}
-
-			sp->units -= units;
-			if (!sp->units){
-				clear_slob_page_free(sp);
-			}
-
-
-			if (print_counter > 6000){
-				printk("\nslob_alloc: Best Fit:  %u\n", best_avail);
-			}
-
-			return best_cur; //we use the "best" variable now, not the old one.
-
-
-			}
-
-			if (print_counter > 6000){
-				printk("\nslob_alloc: Best Fit: None\n");
-			}
-			return NULL;
-		}
-
+		//
 	}
 }
 
