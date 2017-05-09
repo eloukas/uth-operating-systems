@@ -5,7 +5,7 @@
 int main( int argc, char *argv[] ){
 
 	int *pointer;
-    inn i;
+    int i;
 	pointer = (int*)malloc(sizeof(int)*1337);
 
 	//Declare 5 arrays of 'char' variables
