@@ -74,7 +74,6 @@
 #include <linux/atomic.h>
 
 #include "slab.h"
-#include "measurement.h"
 /*
  * slob_block has a field 'units', which indicates size of block if +ve,
  * or offset of next block if -ve (in SLOB_UNITs).
@@ -90,8 +89,8 @@ typedef s32 slobidx_t;
 #endif
 
 static unsigned long print_counter = 0;
-total_alloc_mem = 0;
-total_free_mem = 0;
+static unsigned long total_alloc_mem = 0;
+static unsigned long total_free_mem = 0;
 
 struct slob_block {
 	slobidx_t units;
