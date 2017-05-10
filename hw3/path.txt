@@ -1,0 +1,5 @@
+slob.c:
+    path--> /usr/src/linux-3.14.62-dev/mm
+
+slob.h:
+    path--> /usr/src/linux-3.14.62-dev/include/linux
