@@ -263,13 +263,11 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 	slob_t *best_prev = NULL;
 	slob_t *best_cur = NULL;
 	slob_t *best_aligned = NULL;
+	
+	slob_t *cur_print, *prev_print;
 	int best_delta = 0;
 	slobidx_t best_fit = 0; //variable that keeps the minimum space
-
-    if (print_counter > 6000){
-        printk("slob_Request: %u\n", units);
-        printk("slob_alloc: Candidate blocks size:");
-    }
+	
 
 	//traverse each block in the list
 	for (prev = NULL, cur = sp->freelist; ; prev = cur, cur = slob_next(cur)) {
@@ -279,11 +277,6 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 			aligned = (slob_t *)ALIGN((unsigned long)cur, align);
 			delta = aligned - cur;
 		}
-
-        // print each block size
-        if (print_counter > 6000){
-            printk(" %u", avail - delta);
-        }
 
 		/*
 		 * if there is enough room, then get the block.
@@ -307,20 +300,16 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 				*/
 		}
 
-		//if (slob_last(best_cur)){ //check it again
+		if (slob_last(best_cur)){ //if the block we traverse is the last one in the list
 			if (best_cur != NULL) {
 
 				slob_t *next = NULL;
-
-				//
 				slob_t *best_next = NULL;
 
 				slobidx_t best_avail = slob_units(best_cur);
 				//slob_units = macro that returns the size of a slob block
 
-
 				//Change *every* variable to work for both BESTFIT and FIRSTFIT variables.
-
 				if (best_delta) { /* need to fragment head to align? */
 					best_next = slob_next(best_cur);
 					set_slob(best_aligned, best_avail - best_delta, best_next);
@@ -329,7 +318,25 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 					best_cur = best_aligned;
 					best_avail = slob_units(best_cur);
 				}
+				
+				//Print 
+				if (print_counter >= 6000){
 
+					printk("\nslob_alloc:Request: %d \n", units);
+					printk("slob_alloc:Candidate blocks size: ");
+					for (prev_print = NULL, cur_print = sp->freelist; ; prev_print = cur_print, cur_print = slob_next(cur_print)) {
+						printk("%d ", slob_units(cur_print));
+						if (slob_last(cur_print)){
+							break;
+						}
+					}
+					if (slob_units(best_cur) >= units){
+						printk("\nslob_alloc:Best Fit: %d", slob_units(best_cur));
+					}else {
+						printk("\nslob_alloc:Best Fit:None");
+					}
+				}
+				
 				best_next = slob_next(best_cur);
 				if (best_avail == units) { /* exact fit? unlink. */
 					if (best_prev)
@@ -345,24 +352,17 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 				}
 
 				sp->units -= units;
+				
 				if (!sp->units){
 					clear_slob_page_free(sp);
 				}
-
-
-				if (print_counter > 6000){
-					printk("\nslob_alloc: Best Fit:  %u\n", best_avail);
-				}
-
+				
 				return best_cur; //returns best block
 
-			}else{
-				if (print_counter > 6000){
-					printk("\nslob_alloc: Best Fit: None\n");
-				}
-				return NULL; //couldn't fit on this page..
 			}
-		//
+			//otherwise..
+			return NULL; //couldn't fit on this page..
+		}
 	}
 }
 
@@ -448,7 +448,7 @@ static int best_fit_page(struct page *sp, size_t size, int align){
         }
 
         // main check for best block size
-        if (avail >= units + delta && (best_cur == NULL || avail - (units + delta < best))){
+        if ( 	(avail >= units + delta) && (best_cur == NULL || ( avail - (units + delta) < best) )	){
             best_cur = cur;
             best = avail - (units + delta);
 
