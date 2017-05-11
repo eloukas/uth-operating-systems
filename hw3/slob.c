@@ -407,6 +407,17 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 }
 //end of *slob_page_alloc
 
+// Calculation of free memory!
+unsigned long calc_free_mem(struct list_head *slob_list){
+
+	unsigned long sum = 0;
+	struct page *sp;
+
+	list_for_each_entry(sp, slob_list, list) {
+		sum += sp->units * SLOB_UNIT;
+	}
+	return sum;
+}
 
 /*
  * slob_alloc: entry point into the slob allocator.
@@ -496,7 +507,6 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 			}
 		}
 
-		total_free_mem = total_free_mem + ( (sp->units) * SLOB_UNIT );
 		
 		/* Enough room on this page? */
 		if (sp->units < SLOB_UNITS(size))
@@ -542,7 +552,7 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 
     }
 
-
+    total_free_mem = calc_free_mem(free_slob_small) + calc_free_mem(free_slob_medium) + calc_free_mem(free_slob_large);
 	spin_unlock_irqrestore(&slob_lock, flags);
 
 	/* Not enough space: must allocate a new page */
