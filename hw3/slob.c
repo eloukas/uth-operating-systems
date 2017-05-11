@@ -552,7 +552,7 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 
     }
 
-    total_free_mem = calc_free_mem(free_slob_small) + calc_free_mem(free_slob_medium) + calc_free_mem(free_slob_large);
+    total_free_mem = calc_free_mem(&free_slob_small) + calc_free_mem(&free_slob_medium) + calc_free_mem(&free_slob_large);
 	spin_unlock_irqrestore(&slob_lock, flags);
 
 	/* Not enough space: must allocate a new page */
