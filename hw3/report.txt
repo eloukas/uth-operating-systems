@@ -61,15 +61,15 @@
 	Οι παραπάνω μεταβλητές, σε συνδυασμό με τα κατάλληλα syscalls kαι test programs που φτιάξαμε μας δίνουν τα παρακάτω:
 	
 	Για την τροποποιημένη έκδοση του Κernel: 
-		Best Fit για pages, Best Fit για blocks:
-		Average Allocated Mem    :	1325478   # 1251721   # 12534558  # 1261345   # 1264345  
-		Average Free Mem         :	380       # 1213      # 1670      # 421	  	  #   875     
+		
+		Average Allocated Mem    			:	1325478   # 1251721   # 12534558  # 1261345   # 1264345  
+		Average Free Mem(of all 3 lists)	:   n1        # n2      # n3      # n4	  	  #   n5     
 		
 	Για την original έκδοση του Kernel:
-		Next Fit για pages, First Fit για blocks:
 		
-		Average Allocated Mem 	: 	1427404   # 1336643     # 1330132    # 1335321   # 1337845   
-		Average Free 			: 	2907      # 2499        # 1976       # 1184      # 1073   
+		
+		Average Allocated Mem 				: 	1427404   # 1336643     # 1330132    # 1335321   # 1337845   
+		Average Free Mem (of all 3 lists) 	: 	n1      	# n2        # n3       # n4      # n5   
 
 	Παρατηρήσεις:
 	Μπορούμε να δούμε ότι το Free Memory είναι πάρα πολύ μικρότερο στο Best Fit απ'ό,τι στο First Fit.

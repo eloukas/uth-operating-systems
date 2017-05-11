@@ -90,8 +90,8 @@
 
 
 //Variables to keep track of memory space
-unsigned long total_free_mem ;
-unsigned long total_alloc_mem = 0;
+static unsigned long total_free_mem ;
+static unsigned long total_alloc_mem = 0;
 
 //Functions that return allocated and free memory
 unsigned long get_free_mem(){
