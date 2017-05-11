@@ -75,14 +75,7 @@
 #include "slab.h"
 #include <linux/slob.h>
 
-//Functions that return allocated and free memory
-unsigned long get_free_mem(){
-	return total_free_mem;
-}
 
-unsigned long get_alloc_mem(){
-	return total_alloc_mem;
-}
 
 
 #define BESTPAGESIZE 10000000
@@ -99,6 +92,15 @@ unsigned long get_alloc_mem(){
 //Variables to keep track of memory space
 unsigned long total_free_mem ;
 unsigned long total_alloc_mem = 0;
+
+//Functions that return allocated and free memory
+unsigned long get_free_mem(){
+	return total_free_mem;
+}
+
+unsigned long get_alloc_mem(){
+	return total_alloc_mem;
+}
 
 #ifdef BESTFIT
 	static unsigned int print_counter = 0;
