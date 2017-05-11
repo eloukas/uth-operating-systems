@@ -1,0 +1,4 @@
+Average memory which is allocated: 757972 
+Average memory which is free: 2278342 
+
+Time to accomodate moooore space : 0.003857 (CLOCKS)

@@ -1,0 +1,2 @@
+Average memory which is allocated: 5091368 
+Average memory which is free: 2182776 

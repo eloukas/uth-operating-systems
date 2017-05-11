@@ -81,12 +81,12 @@
 #define BESTPAGESIZE 10000000
 #define DIFF 10000000
 
-#define BESTFIT
+//#define BESTFIT
 
 /* Uncomment this define and comment the previous one(in line 88) 
  * in order to enable
  * original slob.c functionality  */
-//#define FIRSTFIT
+#define FIRSTFIT
 
 
 //Variables to keep track of memory space
@@ -102,9 +102,9 @@ unsigned long get_alloc_mem(){
 	return total_alloc_mem;
 }
 
-#ifdef BESTFIT
-	static unsigned int print_counter = 0;
-#endif
+
+static unsigned int print_counter = 0;
+
 /*
  * slob_block has a field 'units', which indicates size of block if +ve,
  * or offset of next block if -ve (in SLOB_UNITs).
@@ -422,6 +422,9 @@ unsigned long calc_free_mem(struct list_head *slob_list){
 /*
  * slob_alloc: entry point into the slob allocator.
  */
+
+//If you want to change between different versions of slob_alloc(NEXTFIT-BESTFIT):
+//ifdef BESTFIT
 static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 {
 	struct page *sp ;
@@ -577,6 +580,85 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 		memset(b, 0, size);
 	return b;
 }
+
+//#endif 
+
+//Below you will find the original slob_alloc function which uses Next-Fit.Uncomment if you want to use it
+//#define NEXTFIT
+//#ifdef NEXTFIT
+ /*
+ // slob_alloc: entry point into the slob allocator.
+ 
+static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
+{
+	struct page *sp;
+	struct list_head *prev;
+	struct list_head *slob_list;
+	slob_t *b = NULL;
+	unsigned long flags;
+
+	if (size < SLOB_BREAK1)
+		slob_list = &free_slob_small;
+	else if (size < SLOB_BREAK2)
+		slob_list = &free_slob_medium;
+	else
+		slob_list = &free_slob_large;
+
+	spin_lock_irqsave(&slob_lock, flags);
+	//Iterate through each partially free page, try to find room 
+	list_for_each_entry(sp, slob_list, lru) {
+#ifdef CONFIG_NUMA
+		
+		 // If there's a node specification, search for a partial
+		 // page with a matching node id in the freelist.
+		 
+		if (node != NUMA_NO_NODE && page_to_nid(sp) != node)
+			continue;
+#endif
+		//  Enough room on this page? 
+		if (sp->units < SLOB_UNITS(size))
+			continue;
+
+		// Attempt to alloc 
+		prev = sp->lru.prev;
+		b = slob_page_alloc(sp, size, align);
+		if (!b)
+			continue;
+
+		// Improve fragment distribution and reduce our average
+		// search time by starting our next search here. (see
+		// Knuth vol 1, sec 2.5, pg 449) 
+		if (prev != slob_list->prev &&
+				slob_list->next != prev->next)
+			list_move_tail(slob_list, prev->next);
+		break;
+	}
+	spin_unlock_irqrestore(&slob_lock, flags);
+
+	//  Not enough space: must allocate a new page 
+	if (!b) {
+		b = slob_new_pages(gfp & ~__GFP_ZERO, 0, node);
+		if (!b)
+			return NULL;
+		sp = virt_to_page(b);
+		__SetPageSlab(sp);
+
+		spin_lock_irqsave(&slob_lock, flags);
+		sp->units = SLOB_UNITS(PAGE_SIZE);
+		sp->freelist = b;
+		INIT_LIST_HEAD(&sp->lru);
+		set_slob(b, SLOB_UNITS(PAGE_SIZE), b + SLOB_UNITS(PAGE_SIZE));
+		set_slob_page_free(sp, slob_list);
+		b = slob_page_alloc(sp, size, align);
+		BUG_ON(!b);
+		spin_unlock_irqrestore(&slob_lock, flags);
+	}
+	if (unlikely((gfp & __GFP_ZERO) && b))
+		memset(b, 0, size);
+	return b;
+}
+//#endif
+*/
 
 /*
  * slob_free: entry point into the slob allocator.

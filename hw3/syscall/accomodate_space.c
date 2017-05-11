@@ -27,7 +27,7 @@ int main( int argc, char *argv[] ){
 		//Attempt to resize the memory block pointed to by 'pointer' for i*1337 bytes - big size
 		pointer = (int*)realloc(pointer,(i*1337) );
 		
-		sleep(2); // not needed 
+		
 
 	}
 	

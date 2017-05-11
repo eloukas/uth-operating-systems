@@ -24,9 +24,4 @@ echo ""
 read main
 gcc -Wall -static "$main.c" -L. -l"$library_name" -o $main
 
-echo "Type your main program's .c name (without suffix), followed by [ENTER]:"
-echo ""
-read main
-gcc -Wall -static "$main.c" -L. -l"$library_name" -o $main
-
 
