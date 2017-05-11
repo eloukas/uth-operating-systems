@@ -67,7 +67,7 @@
 		
 	Για την original έκδοση του Kernel:
 		Average Allocated Mem 				: 	1427404   	#1336643     #1330132    #1335321   #1337845   
-		Average Free Mem (of all 3 lists) 	: 	3437638     #3561420     #3560773    #3437604   #3537716   
+		Average Free Mem (of all 3 lists) 	: 	3237638     #3261420     #3110773    #3137604   #3187716   
 
 	Παρατηρήσεις:
 	Μπορούμε να δούμε ότι το Free Memory είναι πάρα πολύ μικρότερο στο Best Fit απ'ό,τι στο First Fit.
