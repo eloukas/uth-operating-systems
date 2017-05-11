@@ -61,19 +61,19 @@
 	Οι παραπάνω μεταβλητές, σε συνδυασμό με τα κατάλληλα syscalls kαι test programs που φτιάξαμε μας δίνουν τα παρακάτω:
 	
 	Για την τροποποιημένη έκδοση του Κernel: 
-		
-		Average Allocated Mem    			:	1325478   # 1251721   # 12534558  # 1261345   # 1264345  
-		Average Free Mem(of all 3 lists)	:   n1        # n2      # n3      # n4	  	  #   n5     
+		Average Allocated Mem    			:	1435460		#1430948	#1421008	#1351320 	#1349024
+		Average Free Mem(of all 3 lists)	:	2537604		#2537716	#2537638 	#2561420 	#2560772
+	    
 		
 	Για την original έκδοση του Kernel:
-		
-		
-		Average Allocated Mem 				: 	1427404   # 1336643     # 1330132    # 1335321   # 1337845   
-		Average Free Mem (of all 3 lists) 	: 	n1      	# n2        # n3       # n4      # n5   
+		Average Allocated Mem 				: 	1427404   	#1336643     #1330132    #1335321   #1337845   
+		Average Free Mem (of all 3 lists) 	: 	3437638     #3561420     #3560773    #3437604   #3537716   
 
 	Παρατηρήσεις:
 	Μπορούμε να δούμε ότι το Free Memory είναι πάρα πολύ μικρότερο στο Best Fit απ'ό,τι στο First Fit.
+	Όλα είναι της τάξης των MegaBytes.
 	Σίγουρα έχουμε fragmentation ακόμα, αλλά στην τροποποιημένη έκδοση είναι *αισθητά* λιγότερο.
 	Σε αντίθεση, το "πριονίδι" στην original έκδοση του kernel μας παραμένει ακόμα 
 	ένα μεγάλο πρόβλημα και η αναλογία του Allocated/Free είναι πολλές φορές μικρότερη από αυτή του Best Fit
 	επιβεβαιώνοντας το *αρκετό* fragmentation που υπάρχει στην οriginal έκδοση του SLOB Allocator.
+	Ακόμη, μπορούμε να δούμε και στις 2 περιπτώσεις πως η free memory είναι μεγαλύτερη της allocated.
