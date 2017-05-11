@@ -34,7 +34,7 @@ int main( int argc, char *argv[] ){
 	clock_t end = clock();
 	
 	//return time in an internal scale called "clocks"
-	double time_spent = (double)(end-begin) * 1000.0 / CLOCKS_PER_SEC;
+	double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
 	printf("%Time elapsed with the current algorithm is %f ", time_spent);
 
 
