@@ -21,12 +21,18 @@ static void clook_merged_requests(struct request_queue *q, struct request *rq,
 static int clook_dispatch(struct request_queue *q, int force)
 {
 	struct clook_data *nd = q->elevator->elevator_data;
+    char read_or_write;
 
 	if (!list_empty(&nd->queue)) {
 		struct request *rq;
 		rq = list_entry(nd->queue.next, struct request, queuelist);
 		list_del_init(&rq->queuelist);
 		elv_dispatch_sort(q, rq);
+
+        // check for read or write request!
+        read_or_write = (rq_data_dir(rq) & REQ_WRITE) 'W' : 'R';
+        printk("[CLOOK] add %c %lu\n", read_or_write, blk_rq_pos(rq));
+ 
 		return 1;
 	}
 	return 0;
@@ -36,7 +42,7 @@ static void clook_add_request(struct request_queue *q, struct request *rq)
 {
 	struct clook_data *nd = q->elevator->elevator_data;
     struct list_head *cur_rq = NULL;
-
+    char read_or_write;
 
     // Find the right place for the new request
     list_for_each(cur_rq, &nd->queue) {
@@ -45,7 +51,13 @@ static void clook_add_request(struct request_queue *q, struct request *rq)
         }
     }
 
+    // check for read or write request!
+    read_or_write = (rq_data_dir(rq) & REQ_WRITE) 'W' : 'R';
+    printk("[CLOOK] add %c %lu\n", read_or_write, blk_rq_pos(rq));
     list_add_tail(&rq->queuelist, cur_rq);
+
+
+
 
 }
 static struct request *
