@@ -101,7 +101,7 @@ static struct elevator_type elevator_noop = {
 		.elevator_init_fn		= noop_init_queue,
 		.elevator_exit_fn		= noop_exit_queue,
 	},
-	.elevator_name = "noop",
+	.elevator_name = "clook",
 	.elevator_owner = THIS_MODULE,
 };
 
@@ -119,6 +119,6 @@ module_init(noop_init);
 module_exit(noop_exit);
 
 
-MODULE_AUTHOR("Jens Axboe");
+MODULE_AUTHOR("GROUP 3");
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("No-op IO scheduler");
+MODULE_DESCRIPTION("CLOOK IO scheduler");
