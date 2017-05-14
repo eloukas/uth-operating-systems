@@ -8,9 +8,26 @@
 #include <linux/slab.h>
 #include <linux/init.h>
 
+#define DEBUG
+
 struct clook_data {
 	struct list_head queue;
 };
+
+#ifdef DEBUG
+// PRINT ENTIRE LIST. FOR DEBUG PURPOSE!
+void my_print(struct request_queue *q, struct request *rq){
+    struct clook_data *nd = q->elevator->elevator_data;
+    struct list_head *cur_rq = NULL;
+    int i=1;
+
+    //print the list!
+    list_for_each(cur_rq, &nd->queue) { 
+        printk("[CLOOK] request %d: %lu\n", i, blk_rq_pos(list_entry(cur_rq, struct request, queuelist)));
+        i++;
+    }
+}
+#endif
 
 static void clook_merged_requests(struct request_queue *q, struct request *rq,
 				 struct request *next)
@@ -44,6 +61,11 @@ static void clook_add_request(struct request_queue *q, struct request *rq)
     struct list_head *cur_rq = NULL;
     char read_or_write;
 
+    #ifdef DEBUG
+    printk("[CLOOK] Before add a new request!\n");
+    my_print(q,rq);
+    #endif
+
     // Find the right place for the new request
     list_for_each(cur_rq, &nd->queue) {
         if(rq_end_sector(list_entry(cur_rq, struct request, queuelist)) > rq_end_sector(rq)) {
@@ -54,12 +76,16 @@ static void clook_add_request(struct request_queue *q, struct request *rq)
     // check for read or write request!
     read_or_write = (rq_data_dir(rq) & REQ_WRITE) 'W' : 'R';
     printk("[CLOOK] add %c %lu\n", read_or_write, blk_rq_pos(rq));
+
+    #ifdef DEBUG
+    printk("[CLOOK] After add a new request!\n");
+    my_print(q,rq);
+    #endif
+
+
     list_add_tail(&rq->queuelist, cur_rq);
-
-
-
-
 }
+
 static struct request *
 clook_former_request(struct request_queue *q, struct request *rq)
 {
