@@ -30,7 +30,7 @@ static int clook_dispatch(struct request_queue *q, int force)
 		elv_dispatch_sort(q, rq);
 
         // check for read or write request!
-        read_or_write = (rq_data_dir(rq) & REQ_WRITE) 'W' : 'R';
+        read_or_write = (rq_data_dir(rq) & REQ_WRITE) ? 'W' : 'R';
         printk("[CLOOK] add %c %lu\n", read_or_write, blk_rq_pos(rq));
  
 		return 1;
@@ -52,7 +52,7 @@ static void clook_add_request(struct request_queue *q, struct request *rq)
     }
 
     // check for read or write request!
-    read_or_write = (rq_data_dir(rq) & REQ_WRITE) 'W' : 'R';
+    read_or_write = (rq_data_dir(rq) & REQ_WRITE) ? 'W' : 'R';
     printk("[CLOOK] add %c %lu\n", read_or_write, blk_rq_pos(rq));
 
     list_add_tail(&rq->queuelist, cur_rq);
