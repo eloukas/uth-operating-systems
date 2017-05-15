@@ -41,7 +41,6 @@ config CFQ_GROUP_IOSCHED
 
 config IOSCHED_CLOOK
 	tristate "CLOOK I/O scheduler"
-	bool
 	default y
 	---help---
 	  The clook I/O scheduler.Waiting for help, huh ? Send nudes.
@@ -72,6 +71,7 @@ config DEFAULT_IOSCHED
 	default "deadline" if DEFAULT_DEADLINE
 	default "cfq" if DEFAULT_CFQ
 	default "noop" if DEFAULT_NOOP
+    default "clook" if DEFAULT_CLOOK
 
 endmenu
 
